@@ -4,25 +4,30 @@ from engine.shop import ShopManager
 import time
 
 def start_game():
-    # ... (oldingi kodlar)
-    shop = ShopManager()
-    event_manager = EventManager() # Yangi obyekt
-    
+    # ... boshqa initlar
+    invest_manager = InvestmentManager()
+
     while player.is_alive:
-        # ... (menyu ko'rsatish)
+        # Menyu qismiga qo'shamiz:
+        print(f"Jamg'arma (Bank): ${player.savings:.2f}")
+        print("3. Bank amallari (Omonat/Yechib olish)")
         
+        choice = input("Tanlov: ")
+
         if choice == "1":
-            # 1. Avval oylik moliya hisoblanadi
-            success, message = FinanceManager.process_monthly_cycle(player)
-            print(message)
+            # Oylik sikl ichida foizlarni ham hisoblaymiz
+            interest = invest_manager.process_monthly_interest(player)
+            success, msg = FinanceManager.process_monthly_cycle(player)
+            print(f"{msg} | Bank foizi: +${interest:.2f}")
+            # ...
             
-            # 2. Keyin tasodifiy hodisa sodir bo'lishini tekshiramiz
-            happened, event_msg = event_manager.trigger_random_event(player)
-            if happened:
-                print(event_msg)
-            
-            # 3. O'yin yakunini tekshirish
-            if player.health <= 0:
-                print("\nSog'lig'ingiz yomonlashdi. O'yin tugadi!")
-                player.is_alive = False
-            # ... (bankrot va g'alaba tekshiruvi)
+        elif choice == "3":
+            print("\n1. Pul qo'yish (Deposit)\n2. Pul yechish (Withdraw)")
+            sub_choice = input("Tanlang: ")
+            amount = float(input("Summani kiriting: "))
+            if sub_choice == "1":
+                s, m = invest_manager.deposit_to_bank(player, amount)
+                print(m)
+            elif sub_choice == "2":
+                s, m = invest_manager.withdraw_from_bank(player, amount)
+                print(m)
