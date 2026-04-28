@@ -4,25 +4,25 @@ from engine.shop import ShopManager
 import time
 
 def start_game():
-    # ... (oldingi kod: ism va maqsad kiritish)
+    # ... (oldingi kodlar)
     shop = ShopManager()
+    event_manager = EventManager() # Yangi obyekt
     
     while player.is_alive:
-        print(f"\n--- {month_count}-oy | Balans: ${player.balance:.2f} | Sog'liq: {player.health} ---")
-        print("1. Keyingi oyga o'tish (Oylik va Xarajatlar)")
-        print("2. Do'kon va Ta'lim (Investitsiya o'ziga)")
-        print("3. O'yinni tugatish")
-        
-        choice = input("Tanlov: ")
+        # ... (menyu ko'rsatish)
         
         if choice == "1":
+            # 1. Avval oylik moliya hisoblanadi
             success, message = FinanceManager.process_monthly_cycle(player)
             print(message)
-            # ... (victory va bankrot tekshiruvi)
             
-        elif choice == "2":
-            shop.show_menu()
-            item_choice = input("Nima sotib olasiz? (0-bekor qilish): ")
-            if item_choice != "0":
-                bought, msg = shop.buy_item(player, item_choice)
-                print(msg)
+            # 2. Keyin tasodifiy hodisa sodir bo'lishini tekshiramiz
+            happened, event_msg = event_manager.trigger_random_event(player)
+            if happened:
+                print(event_msg)
+            
+            # 3. O'yin yakunini tekshirish
+            if player.health <= 0:
+                print("\nSog'lig'ingiz yomonlashdi. O'yin tugadi!")
+                player.is_alive = False
+            # ... (bankrot va g'alaba tekshiruvi)
