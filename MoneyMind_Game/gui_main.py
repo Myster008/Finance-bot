@@ -52,25 +52,44 @@ def draw_text(text, current_font, color, x, y):
 
 def main_gui():
     player = Player("Myster008", 75000)
-    images = load_assets() # Rasmlarni yuklash
+    shop_manager = ShopManager()
+    images = load_assets()
     running = True
     
-    # Tugmalar
-    next_month_btn = Button(580, 520, 200, 50, "KEYINGI OY", (46, 204, 113), (39, 174, 96))
+    # Do'kon oynasi obyekti
+    shop_ui = ShopWindow(150, 100, 500, 400, shop_manager)
+    
+    # Asosiy menyu tugmalari
     shop_btn = Button(20, 520, 180, 50, "DO'KON", (52, 152, 219), (41, 128, 185))
-    bank_btn = Button(220, 520, 180, 50, "BANK", (155, 89, 182), (142, 68, 173))
+    # ... (boshqa tugmalar)
 
     while running:
-        screen.fill((236, 240, 241)) # Fon
-        
+        # ... (fonni chizish)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             
-            if next_month_btn.is_clicked(event):
-                FinanceManager.process_monthly_cycle(player)
-                # Oylik sikl ichida random event mantiqini ham gui_main.py ga ulash kerak bo'ladi
+            # 1. Do'kon oynasi ochiq bo'lsa, faqat uning ichidagi kliklarni eshitish
+            if shop_ui.is_visible:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    shop_ui.is_visible = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    shop_ui.handle_click(event.pos, player)
+            else:
+                # 2. Do'kon yopiq bo'lsa, asosiy tugmalarni eshitish
+                if shop_btn.is_clicked(event):
+                    shop_ui.is_visible = True
+                # ... (keyingi oy tugmasi)
 
+        # Chizish tartibi muhim:
+        # Avval asosiy o'yin elementlari...
+        shop_btn.draw(screen)
+        
+        # ENG OXIRIDA DO'KONNI CHIZAMIZ (hamma narsani ustida bo'lishi uchun)
+        shop_ui.draw(screen)
+
+        pygame.display.flip()
         # --- VIZUALIZATSIYA ---
         
         # 1. Header (Status paneli)
