@@ -1,43 +1,28 @@
 from engine.player import Player
 from engine.finance import FinanceManager
+from engine.shop import ShopManager
 import time
 
 def start_game():
-    print("--- MOLIYAVIY ERKINLIK O'YINIGA XUSH KELIBSIZ ---")
-    name = input("Ismingizni kiriting: ")
-    try:
-        target = float(input("Maqsadingiz (necha pul yig'moqchisiz?): "))
-    except ValueError:
-        target = 100000.0 # Default maqsad
-
-    player = Player(name, target)
-    month_count = 0
-
+    # ... (oldingi kod: ism va maqsad kiritish)
+    shop = ShopManager()
+    
     while player.is_alive:
-        month_count += 1
-        print(f"\n--- {month_count}-oy ---")
-        print(player.get_status())
-        
-        print("\n1. Keyingi oyga o'tish")
-        print("2. Investitsiya qilish (tez kunda)")
+        print(f"\n--- {month_count}-oy | Balans: ${player.balance:.2f} | Sog'liq: {player.health} ---")
+        print("1. Keyingi oyga o'tish (Oylik va Xarajatlar)")
+        print("2. Do'kon va Ta'lim (Investitsiya o'ziga)")
         print("3. O'yinni tugatish")
         
-        choice = input("Tanlang: ")
+        choice = input("Tanlov: ")
         
         if choice == "1":
             success, message = FinanceManager.process_monthly_cycle(player)
             print(message)
+            # ... (victory va bankrot tekshiruvi)
             
-            if player.check_victory():
-                print(f"\nTABRIKLAYMIZ! Siz {month_count} oyda maqsadga erishdingiz!")
-                break
-            if not success:
-                print("\nO'YIN TUGADI. Siz kambag'allikdan chiqa olmadingiz.")
-                break
-        elif choice == "3":
-            break
-        else:
-            print("Hozircha faqat 1-tugma ishlaydi!")
-
-if __name__ == "__main__":
-    start_game()
+        elif choice == "2":
+            shop.show_menu()
+            item_choice = input("Nima sotib olasiz? (0-bekor qilish): ")
+            if item_choice != "0":
+                bought, msg = shop.buy_item(player, item_choice)
+                print(msg)
