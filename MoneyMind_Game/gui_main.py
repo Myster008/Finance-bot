@@ -126,5 +126,46 @@ def main_gui():
 
     pygame.quit()
 
+def main_gui():
+    # ... (oldingi initlar)
+    event_manager = EventManager()
+    notify_ui = NotificationWindow(200, 150, 400, 300)
+    
+    game_active = True # O'yin tugaganini tekshirish uchun
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            # Xabarnoma ochiq bo'lsa, ENTER bilan yopish
+            if notify_ui.is_visible:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    notify_ui.is_visible = False
+                    if not game_active: # Agar o'yin tugagan bo'lsa, qayta boshlash yoki chiqish
+                        running = False
+                continue # Xabar ochiq turganda boshqa tugmalar ishlamaydi
+
+            # KEYINGI OY TUGMASI BOSILGANDA
+            if next_month_btn.is_clicked(event) and game_active:
+                # 1. Moliya
+                success, msg = FinanceManager.process_monthly_cycle(player)
+                
+                # 2. Tasodifiy hodisa
+                happened, ev_msg = event_manager.trigger_random_event(player)
+                if happened:
+                    notify_ui.show("DIQQAT!", ev_msg, (230, 126, 34)) # To'q sariq
+                
+                # 3. Bankrot yoki G'alaba tekshiruvi
+                if not success or player.health <= 0:
+                    game_active = False
+                    notify_ui.show("O'YIN TUGADI", "Siz bankrot bo'ldingiz yoki sog'lig'ingiz yomonlashdi. Hayotda pulni yaxshiroq boshqarishga harakat qiling!", (231, 76, 60))
+                elif player.check_victory():
+                    game_active = False
+                    notify_ui.show("G'ALABA!", f"Tabriklaymiz! Siz o'z maqsadingizga (${player.target_money}) erishdingiz!", (46, 204, 113))
+
+        # ... (Chizish qismi)
+        notify_ui.draw(screen)
+        pygame.display.flip()
 if __name__ == "__main__":
     main_gui()
