@@ -1,59 +1,54 @@
 import pygame
 from engine.player import Player
 from engine.finance import FinanceManager
+from utils.ui_elements import Button
 
-# 1. Init
+# Init va Oyna sozlamalari
 pygame.init()
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("MoneyMind: Moliyaviy Erkinlik")
-
-# Ranglar
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GREEN = (46, 204, 113)
-RED = (231, 76, 60)
-BLUE = (52, 152, 219)
-
-# Shriftlar
-font = pygame.font.SysFont("Arial", 24)
-title_font = pygame.font.SysFont("Arial", 32, bold=True)
-
-def draw_text(text, font, color, x, y):
-    img = font.render(text, True, color)
-    screen.blit(img, (x, y))
+screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("MoneyMind Simulyatori")
+clock = pygame.time.Clock()
 
 def main_gui():
-    player = Player("Myster008", 100000) # Test uchun
+    player = Player("Myster008", 50000)
     running = True
     
+    # Tugmalarni yaratish
+    next_month_btn = Button(550, 500, 200, 50, "KEYINGI OY", (46, 204, 113), (39, 174, 96))
+    shop_btn = Button(50, 500, 200, 50, "DO'KON", (52, 152, 219), (41, 128, 185))
+    bank_btn = Button(300, 500, 200, 50, "BANK", (155, 89, 182), (142, 68, 173))
+
     while running:
-        screen.fill((240, 240, 240)) # Och kulrang fon
+        screen.fill((236, 240, 241)) # Yumshoq oq fon
         
-        # Voqealarni ushlash
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE: # Space bosilsa keyingi oy
-                    FinanceManager.process_monthly_cycle(player)
+            
+            # Tugma bosilishini tekshirish
+            if next_month_btn.is_clicked(event):
+                FinanceManager.process_monthly_cycle(player)
+            
+            if shop_btn.is_clicked(event):
+                print("Do'kon oynasi ochildi (Mantiq ulangan)")
+                # Bu yerda alohida Shop UI chiqarish mumkin
 
-        # Vizual Panellar
-        pygame.draw.rect(screen, WHITE, (20, 20, 350, 200), border_radius=10) # Status paneli
-        draw_text("Moliyaviy Holat", title_font, BLACK, 40, 30)
-        draw_text(f"Balans: ${player.balance:,.2f}", font, GREEN, 40, 80)
-        draw_text(f"Bank: ${player.savings:,.2f}", font, BLUE, 40, 120)
-        
-        # Progress Bar (Maqsadga erishish)
-        pygame.draw.rect(screen, BLACK, (400, 50, 350, 30), 2) # Ramka
-        progress_width = min(350 * ((player.balance + player.savings) / player.target_money), 350)
-        pygame.draw.rect(screen, GREEN, (400, 50, progress_width, 30))
-        draw_text("Maqsad sari yo'l", font, BLACK, 400, 20)
+        # UI Chizish
+        # 1. Tepada Header (O'yinchi statusi)
+        pygame.draw.rect(screen, (44, 62, 80), (0, 0, 800, 80))
+        # (Shu yerda draw_text orqali balans va sog'liqni chizamiz)
 
-        # Tugmalar bo'limi (Pastda)
-        draw_text("Keyingi oyga o'tish uchun [SPACE] ni bosing", font, BLACK, 200, 500)
+        # 2. O'yinchi personaji (Hozircha oddiy doira, keyinchalik rasm)
+        pygame.draw.circle(screen, (52, 152, 219), (400, 300), 50)
+        # Personaj holati sog'liqqa qarab o'zgarishi mumkin (yashil/qizil)
+
+        # 3. Tugmalarni chiqarish
+        next_month_btn.draw(screen)
+        shop_btn.draw(screen)
+        bank_btn.draw(screen)
 
         pygame.display.flip()
+        clock.tick(60)
 
     pygame.quit()
 
