@@ -96,3 +96,55 @@ class ShopWindow:
                 print(msg) # Bu yerda keyinchalik ekranda xabar chiqarishimiz mumkin
                 return True
         return False
+
+class NotificationWindow:
+    def __init__(self, x, y, width, height):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.is_visible = False
+        self.title = ""
+        self.message = ""
+        self.color = (44, 62, 80) # To'q ko'k
+        self.font = pygame.font.SysFont("Arial", 20)
+        self.title_font = pygame.font.SysFont("Arial", 26, bold=True)
+
+    def show(self, title, message, color=(44, 62, 80)):
+        self.title = title
+        self.message = message
+        self.color = color
+        self.is_visible = True
+
+    def draw(self, screen):
+        if not self.is_visible:
+            return
+
+        # Fonni biroz xiralashtirish
+        overlay = pygame.Surface((800, 600), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        screen.blit(overlay, (0, 0))
+
+        # Xabar oynasi
+        pygame.draw.rect(screen, (255, 255, 255), self.rect, border_radius=15)
+        pygame.draw.rect(screen, self.color, self.rect, 4, border_radius=15)
+
+        # Matnlarni chizish
+        title_surf = self.title_font.render(self.title, True, self.color)
+        screen.blit(title_surf, (self.rect.x + 20, self.rect.y + 20))
+
+        # Uzun xabarlarni bir necha qatorga bo'lish (oddiy usul)
+        words = self.message.split(' ')
+        line = ""
+        y_pos = self.rect.y + 70
+        for word in words:
+            if len(line + word) < 40:
+                line += word + " "
+            else:
+                msg_surf = self.font.render(line, True, (0, 0, 0))
+                screen.blit(msg_surf, (self.rect.x + 20, y_pos))
+                y_pos += 30
+                line = word + " "
+        msg_surf = self.font.render(line, True, (0, 0, 0))
+        screen.blit(msg_surf, (self.rect.x + 20, y_pos))
+
+        # "OK" tugmasi ko'rsatmasi
+        ok_txt = self.font.render("Davom etish uchun [ENTER] bosing", True, (127, 140, 141))
+        screen.blit(ok_txt, (self.rect.centerx - 120, self.rect.bottom - 40))
