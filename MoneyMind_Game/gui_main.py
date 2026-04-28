@@ -169,3 +169,14 @@ def main_gui():
         pygame.display.flip()
 if __name__ == "__main__":
     main_gui()
+
+# main_gui funksiyasi ichida:
+save_btn = Button(20, 450, 100, 40, "SAQLASH", (149, 165, 166), (127, 140, 141))
+
+# Event loop ichida:
+if save_btn.is_clicked(event):
+    msg = player.save_game()
+    notify_ui.show("TIZIM", msg, (52, 73, 94))
+
+# Draw qismida:
+save_btn.draw(screen)
