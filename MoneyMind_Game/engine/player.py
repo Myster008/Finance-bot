@@ -7,7 +7,7 @@ class Player:
         self.balance = 1000               # Naqd pul
         self.savings = 0                  # Jamg'arma (bankda)
         self.passive_income = 0           # Biznes yoki investitsiyadan
-        
+        self.stocks_value = 0
         # Hayotiy ko'rsatkichlar
         self.monthly_income = 500         # Boshlang'ich oylik
         self.monthly_expenses = 300       # Majburiy (oziq-ovqat, ijara)
